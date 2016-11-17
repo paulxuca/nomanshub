@@ -1,0 +1,22 @@
+/*.App {
+  background: linear-gradient(#373773, #235689);
+  height: 100vh;
+  display: block;
+  overflow: hidden;
+  -webkit-animation: skygradient 180s ease infinite;
+  -moz-animation: skygradient 180s ease infinite;
+  -o-animation: skygradient 180s ease infinite;
+  animation: skygradient 180s ease infinite;
+}*/
+
+body {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(180deg, #373773, #235689);
+  background-repeat: no-repeat;
+  overflow:hidden;
+}
+
+canvas {
+  width: 100%!important; height: 100%!important;
+}
