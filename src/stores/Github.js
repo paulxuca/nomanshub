@@ -6,10 +6,13 @@ const toJSON = (s) => s.json();
 export default class GithubStore {
   @observable userData;
   @observable fetchErrors;
+  @observable selectedRepoIndex;
 
   constructor() {
     this.getUser = this.getUser.bind(this);
   }
+
+  selectRepoIndex = (i) => this.selectedRepoIndex = i;
 
   async getUser(username) {
     try {

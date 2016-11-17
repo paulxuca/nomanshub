@@ -30,7 +30,7 @@ export default class Planet {
     const { HEIGHT, WIDTH } = getWindow();
     const planetRadius = randomRange(20, 80) * sizeMultiplier;   
     this.minRadius = randomRange(planetRadius + 10 , planetRadius + 20);
-    this.maxRadius = planetRadius + randomRange(10, 40) * stargazerMultiplier;
+    this.maxRadius = planetRadius + randomRange(10, 40) * stargazerMultiplier / 10;
     this.minSpeed = randomRange(0,5)*0.1 + randomRange(0,9) * 0.01;
     this.maxSpeed = randomRange(0,5)*0.1 + randomRange(0,9) * 0.01;
     this.minSize = randomRange(1,3) + randomRange(0,9) * 0.01;

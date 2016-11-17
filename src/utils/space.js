@@ -1,5 +1,8 @@
 const THREE = require('three');
+const TWEEN = require('tween.js');
 const OrbitControls = require('three-orbitcontrols')
+
+let controls;
 
 const Colors = {
   red : 0xf85051,
@@ -75,7 +78,7 @@ export const initApp = (height, width) => {
   renderer.setSize(width, height);
   renderer.shadowMap.enabled = true;
   
-  const controls = new OrbitControls(camera, renderer.domElement);
+  controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.25;
   controls.enableZoom = false;
@@ -118,3 +121,7 @@ export const screenXY = (obj, camera, renderer) => {
       y: vector.y
   };
 };
+
+export const buildSmoothCamera = (camera, position) => {
+  camera.lookAt(position);
+}

@@ -7,6 +7,7 @@ import Planet from './utils/planet';
 import {
   initApp,
   screenXY,
+  buildSmoothCamera,
 } from './utils/space';
 import { generateStars } from './utils/stars';
 import './App.css';
@@ -37,11 +38,12 @@ class App extends Component {
 
   componentWillMount() {
     const { getUser } = this.props.store.github;
-    getUser('paulxuca').then(() => {
+    getUser('kshvmdn').then(() => {
       this.setState({ isLoaded: true });
       this.generatePlanet();
     });
     this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.smoothLookAt = this.smoothLookAt.bind(this);
     this.handleFlag = 0;
   }
 
@@ -91,6 +93,10 @@ class App extends Component {
     camera.updateProjectionMatrix();
   }
 
+  smoothLookAt(position) {
+    buildSmoothCamera(camera, position);
+  }
+
   handleMouseUp(e) {
     if (this.handleFlag === 0) {
       let min = 10000;
@@ -102,7 +108,8 @@ class App extends Component {
           minIndex = i;
         }
       }
-      console.log(min, this.props.store.github.userRepos[minIndex]);
+      this.props.store.github.selectRepoIndex(minIndex);
+      this.smoothLookAt(planets[minIndex].planetObject.parent.position);
     }
   }
 
