@@ -1,5 +1,5 @@
 const THREE = require('three');
-const TWEEN = require('tween.js');
+// const TWEEN = require('tween.js');
 const OrbitControls = require('three-orbitcontrols')
 
 let controls;
@@ -125,3 +125,5 @@ export const screenXY = (obj, camera, renderer) => {
 export const buildSmoothCamera = (camera, position) => {
   camera.lookAt(position);
 }
+
+export const point2Distance = (a, b) => Math.sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));

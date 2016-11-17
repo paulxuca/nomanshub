@@ -23,3 +23,13 @@
   margin-left: 10px;
   text-transform: lowercase;
 }
+
+.repoName {
+  font-size: 28px;
+  display: block;
+}
+
+.repoDesc {
+  font-size: 18px;
+  text-transform: lowercase;
+}

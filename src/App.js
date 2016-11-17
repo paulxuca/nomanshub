@@ -6,8 +6,9 @@ import HUD from './components/HUD';
 import Planet from './utils/planet';
 import {
   initApp,
-  screenXY,
+  point2Distance,
   buildSmoothCamera,
+  screenXY,
 } from './utils/space';
 import { generateStars } from './utils/stars';
 import './App.css';
@@ -39,8 +40,8 @@ class App extends Component {
   componentWillMount() {
     const { getUser } = this.props.store.github;
     getUser('kshvmdn').then(() => {
+      this.generatePlanet();      
       this.setState({ isLoaded: true });
-      this.generatePlanet();
     });
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.smoothLookAt = this.smoothLookAt.bind(this);
@@ -99,24 +100,41 @@ class App extends Component {
 
   handleMouseUp(e) {
     if (this.handleFlag === 0) {
-      let min = 10000;
+      const mousePos = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+
+      const firstPlanetPos = screenXY(planets[0].planetObject.parent, camera, renderer);
+      let minDistance = point2Distance(mousePos, firstPlanetPos);
       let minIndex = 0;
-      for (var i = 0; i < planets.length; i++) {
-        const { x } = screenXY(planets[i].planetObject.parent, camera, renderer);
-        if (Math.abs(e.clientX - x) < min) {
-          min = Math.abs(e.clientX - x);
+
+      for (var i = 1; i < planets.length; i++) {
+        const planetPos = screenXY(planets[i].planetObject.parent, camera, renderer);
+        const mouseDistance = point2Distance(mousePos, planetPos);
+        if (mouseDistance < minDistance) {
           minIndex = i;
+          minDistance = mouseDistance;
         }
       }
-      this.props.store.github.selectRepoIndex(minIndex);
-      this.smoothLookAt(planets[minIndex].planetObject.parent.position);
+
+      if (minDistance < 200) {
+        this.props.store.github.selectRepoIndex(minIndex);
+        this.smoothLookAt(planets[minIndex].planetObject.parent.position);
+      }     
     }
   }
 
   render() {
+    const { userData, userRepos, selectedRepoIndex } = this.props.store.github;
+
     return (
       <div className="App">
-        {this.state.isLoaded ? <HUD /> : null}
+        {this.state.isLoaded ? <HUD
+          repos={userRepos}
+          user={userData}
+          index={selectedRepoIndex}
+          /> : null}
         <div id="universe" />
       </div>
     );

@@ -74,7 +74,7 @@ export default class Planet {
     posX = shiftPosition(posX, planetRadius);
     posY = shiftPosition(posY, planetRadius);
 
-    orbitalMesh.position.set(posX, posY, randomRange(-100 * ageMultiplier, 100 * ageMultiplier));
+    orbitalMesh.position.set(posX, posY, randomRange(-100 * ageMultiplier, 100 * ageMultiplier) * ageMultiplier / 5);
     scene.add(orbitalMesh);
   }
 

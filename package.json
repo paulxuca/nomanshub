@@ -51,6 +51,7 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
+    "baffle": "^0.3.6",
     "fast-async": "^6.1.2",
     "mobx": "^2.6.2",
     "mobx-react": "^3.5.9",
