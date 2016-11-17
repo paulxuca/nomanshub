@@ -1,0 +1,25 @@
+.hudContainer {
+  position: absolute;
+  width: 100%;
+  color: white;
+  margin-left: 20px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.githubUsername {
+  font-size: 40px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+.companyName {
+  font-size: 20px;
+  letter-spacing: 2px;
+  margin-left: 10px;
+  text-transform: lowercase;
+}

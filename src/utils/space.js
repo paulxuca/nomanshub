@@ -1,4 +1,5 @@
 const THREE = require('three');
+const OrbitControls = require('three-orbitcontrols')
 
 const Colors = {
   red : 0xf85051,
@@ -12,6 +13,14 @@ const Colors = {
 };
 
 const colorsLength = Object.keys(Colors).length;
+
+export const getWindow = () => ({
+  HEIGHT: window.innerHeight,
+  WIDTH: window.innerWidth,
+});
+
+export const getRaycaster = () => new THREE.Raycaster();
+export const getMouse = () => new THREE.Vector2();
 
 export const randomRange = (min, max) => Math.floor(Math.random()*(max-min+1)+min);
 export const randomColor = () => {
@@ -50,3 +59,62 @@ export const rule3 = (v,vmin,vmax,tmin, tmax) => {
   var tv = tmin + (pc*dt);
   return tv * 0.06;
 }
+
+export const initApp = (height, width) => {
+  const scene = new THREE.Scene();
+  
+  const camera = new THREE.PerspectiveCamera(75, width / height, .1, 3000);
+  camera.position.z = 1;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  
+  const renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true,
+  });
+  renderer.setSize(width, height);
+  renderer.shadowMap.enabled = true;
+  
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.25;
+  controls.enableZoom = false;
+
+  const ambientLight = new THREE.AmbientLight(0x663344,2);
+  scene.add(ambientLight);
+  const light = new THREE.DirectionalLight(0xffffff, 1.5);
+  light.position.set(200,100,200);
+  light.castShadow = true;
+
+  light.shadow.camera.near = 1;
+  light.shadow.camera.far = 1000;
+  light.shadow.mapSize.width = 2048;
+  light.shadow.mapSize.height = 2048;
+  scene.add(light);
+
+
+  return { 
+    scene,
+    renderer,
+    camera,
+  };
+}
+
+export const screenXY = (obj, camera, renderer) => {
+  var vector = new THREE.Vector3();
+
+  var widthHalf = 0.5*renderer.context.canvas.width;
+  var heightHalf = 0.5*renderer.context.canvas.height;
+
+  obj.updateMatrixWorld();
+  vector.setFromMatrixPosition(obj.matrixWorld);
+  vector.project(camera);
+
+  vector.x = ( vector.x * widthHalf ) + widthHalf;
+  vector.y = - ( vector.y * heightHalf ) + heightHalf;
+
+  return { 
+      x: vector.x,
+      y: vector.y
+  };
+};

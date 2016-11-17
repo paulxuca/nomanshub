@@ -1,5 +1,5 @@
-import LocationStore from './location';
+import GithubStore from './Github';
 
 export default () => ({
-  location: new LocationStore(),
+  github: new GithubStore(),
 });

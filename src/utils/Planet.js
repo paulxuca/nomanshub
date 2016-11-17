@@ -1,4 +1,4 @@
-import { randomColor, randomRange, getMaterial, shiftPosition, rule3 } from './space';
+import { randomColor, randomRange, getMaterial, shiftPosition, rule3, getWindow } from './space';
 
 const THREE = require('three');
 
@@ -26,17 +26,18 @@ class Particle {
 }
 
 export default class Planet {
-  constructor(height, width, scene) {
-    const planetRadius = randomRange(12, 70);   
-    this.minRadius = randomRange(planetRadius + 10 , 60);
-    this.maxRadius = randomRange(40,70);
+  constructor({ scene, ageMultiplier, sizeMultiplier, stargazerMultiplier }) {
+    const { HEIGHT, WIDTH } = getWindow();
+    const planetRadius = randomRange(20, 80) * sizeMultiplier;   
+    this.minRadius = randomRange(planetRadius + 10 , planetRadius + 20);
+    this.maxRadius = planetRadius + randomRange(10, 40) * stargazerMultiplier;
     this.minSpeed = randomRange(0,5)*0.1 + randomRange(0,9) * 0.01;
     this.maxSpeed = randomRange(0,5)*0.1 + randomRange(0,9) * 0.01;
-    this.minSize = randomRange(1,3) + randomRange(0,9) * 0.05;
+    this.minSize = randomRange(1,3) + randomRange(0,9) * 0.01;
     this.maxSize = randomRange(1,3) + randomRange(0,9) * 0.05;
-    this.particleCount = randomRange(5, 20);
+    this.particleCount = randomRange(5, 10) * stargazerMultiplier;
 
-    const planetDetail = randomRange(2, 3);
+    const planetDetail = randomRange(2, 5);
     const planetGeometry = new THREE.TetrahedronGeometry(planetRadius, planetDetail);
 
 
@@ -67,13 +68,13 @@ export default class Planet {
     orbitalMesh.rotation.x = (Math.random()*2-1) * 2 * Math.PI;
     orbitalMesh.rotation.z = (Math.random()*2-1) * 2 * Math.PI;
 
-    let posX = randomRange(-1 * Math.floor(width/4),Math.floor(width/4));
-    let posY = randomRange(-1 * Math.floor(height/4),Math.floor(height/4));
+    let posX = randomRange(-WIDTH, WIDTH);
+    let posY = randomRange(-HEIGHT, HEIGHT);
 
     posX = shiftPosition(posX, planetRadius);
     posY = shiftPosition(posY, planetRadius);
 
-    orbitalMesh.position.set(posX, posY, randomRange(-1000, 1000));
+    orbitalMesh.position.set(posX, posY, randomRange(-100 * ageMultiplier, 100 * ageMultiplier));
     scene.add(orbitalMesh);
   }
 
@@ -98,19 +99,18 @@ export default class Planet {
       currentParticle.position.x = posX;
       currentParticle.position.z = posZ; 
 
-      currentParticle.rotation.x += Math.random()*.05;
-      currentParticle.rotation.y += Math.random()*.05;
-      currentParticle.rotation.z += Math.random()*.05;
+      currentParticle.rotation.x += Math.random() *.05;
+      currentParticle.rotation.y += Math.random() *.05;
+      currentParticle.rotation.z += Math.random() *.05;
     }
   }
 
   updateParticles() {
     for (var i = 0; i < this.particleCount; i ++) {
-      const currentParticle = this.ringObject.children[i];
-    
+      const currentParticle = this.ringObject.children[i];    
       const s = this.minSize + Math.random()*(this.maxSize - this.minSize);
       currentParticle.scale.set(s, s, s);
-      currentParticle.userData.distance = this.minRadius +  Math.random() * (this.maxRadius - this.minRadius);
+      currentParticle.userData.distance = this.minRadius +  Math.random() * this.maxRadius / 2;
       currentParticle.userData.angle = this.angleStep * i;
       currentParticle.userData.angularSpeed = rule3(currentParticle.userData.distance, this.minRadius, this.maxRadius, this.minSpeed, this.maxSpeed) * 0.05;
     }

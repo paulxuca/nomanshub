@@ -51,13 +51,15 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
+    "fast-async": "^6.1.2",
     "mobx": "^2.6.2",
     "mobx-react": "^3.5.9",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "styled-components": "^1.0.11",
     "three": "^0.82.1",
-    "three-orbitcontrols": "^1.1.2"
+    "three-orbitcontrols": "^1.1.2",
+    "whatwg-fetch": "^2.0.0"
   },
   "scripts": {
     "start": "node scripts/start.js",

@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
-import Planet from './utils/Planet';
+import { observer, inject } from 'mobx-react';
+
+import HUD from './components/HUD';
+
+import Planet from './utils/planet';
+import {
+  initApp,
+  screenXY,
+} from './utils/space';
+import { generateStars } from './utils/stars';
 import './App.css';
-
-const THREE = require('three');
-const OrbitControls = require('three-orbitcontrols')
-
 
 let scene;
 let camera;
 let renderer;
-let light;
-let planets = [];
 
+const planets = [];
 
 function animate() {
   for (var i = 0; i < planets.length; i++) {
@@ -22,70 +26,59 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+@inject('store') @observer
 class App extends Component {
-  componentWillMount() {
-    window.addEventListener('resize', this.handleWindowResize);
+  constructor() {
+    super();
+    this.state = {
+      isLoaded: false,
+    };
   }
-  
+
+  componentWillMount() {
+    const { getUser } = this.props.store.github;
+    getUser('paulxuca').then(() => {
+      this.setState({ isLoaded: true });
+      this.generatePlanet();
+    });
+    this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.handleFlag = 0;
+  }
+
   componentDidMount() {
+    window.addEventListener('mousemove', () => {
+      this.handleFlag = 1;
+    });
+    window.addEventListener('mousedown', () => {
+      this.handleFlag = 0;
+    });    
+    window.addEventListener('mouseup', this.handleMouseUp);
+    window.addEventListener('resize', this.handleWindowResize);
+
     this.HEIGHT = window.innerHeight;
     this.WIDTH = window.innerWidth;
-    console.log(this.HEIGHT, this.WIDTH);
-    
-    scene = new THREE.Scene();
-    
-    camera = new THREE.PerspectiveCamera(75, this.WIDTH/this.HEIGHT, .1, 2000);
-    camera.position.z = 100;
-    camera.aspect = this.WIDTH / this.HEIGHT;
-    camera.updateProjectionMatrix();
-    
-    renderer = new THREE.WebGLRenderer({
-      alpha: true,
-      antialias: true,
-    });
-    renderer.setSize(this.WIDTH, this.HEIGHT);
-    renderer.shadowMap.enabled = true;
-    
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.25;
-    controls.enableZoom = false;
-    
-    
-    
-    this.initScene();
-  }
+    const settings = initApp(this.HEIGHT, this.WIDTH);
+    scene = settings.scene;
+    renderer = settings.renderer;
+    camera = settings.camera;
 
-  initScene() {
-    const ambientLight = new THREE.AmbientLight(0x663344,2);
-    scene.add(ambientLight);
-
-    light = new THREE.DirectionalLight(0xffffff, 1.5);
-    light.position.set(200,100,200);
-    light.castShadow = true;
-    light.shadow.camera.left = -400;
-    light.shadow.camera.right = 400;
-    light.shadow.camera.top = 400;
-    light.shadow.camera.bottom = -400;
-    light.shadow.camera.near = 1;
-    light.shadow.camera.far = 1000;
-    light.shadow.mapSize.width = 2048;
-    light.shadow.mapSize.height = 2048;
-    scene.add(light);
     document.getElementById('universe').appendChild(renderer.domElement);
-    this.generatePlanet();
+    generateStars(scene, 300, this.WIDTH, this.HEIGHT);
   }
 
   generatePlanet() {
-    
-    for (var i = 0; i < 10; i ++) {
-      planets.push(new Planet(this.HEIGHT, this.WIDTH, scene));
+    const { userRepos } = this.props.store.github;
+    for (var i = 0; i < userRepos.length; i ++) {
+      planets.push(
+        new Planet({
+          scene,
+          ageMultiplier: i,
+          sizeMultiplier: userRepos[i].size / 40000 + 1,
+          stargazerMultiplier: userRepos[i].stargazers_count,
+        })
+      );
     }
     animate();
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleWindowResize);
   }
 
   handleWindowResize() {
@@ -98,9 +91,25 @@ class App extends Component {
     camera.updateProjectionMatrix();
   }
 
+  handleMouseUp(e) {
+    if (this.handleFlag === 0) {
+      let min = 10000;
+      let minIndex = 0;
+      for (var i = 0; i < planets.length; i++) {
+        const { x } = screenXY(planets[i].planetObject.parent, camera, renderer);
+        if (Math.abs(e.clientX - x) < min) {
+          min = Math.abs(e.clientX - x);
+          minIndex = i;
+        }
+      }
+      console.log(min, this.props.store.github.userRepos[minIndex]);
+    }
+  }
+
   render() {
     return (
       <div className="App">
+        {this.state.isLoaded ? <HUD /> : null}
         <div id="universe" />
       </div>
     );

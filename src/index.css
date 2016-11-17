@@ -1,5 +1,9 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+@font-face {
+	font-family: 'GeosansLight-NMS';
+	src: url('./static/GeosansLight-NMS.eot');
+	src: url('./static/GeosansLight-NMS.eot?#iefix') format('embedded-opentype'),
+		url('./static/GeosansLight-NMS.woff') format('woff'),
+		url('./static/GeosansLight-NMS.ttf') format('truetype');
+	font-weight: 300;
+	font-style: normal;
 }

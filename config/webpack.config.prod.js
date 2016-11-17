@@ -103,7 +103,11 @@ module.exports = {
         test: /\.(js|jsx)$/,
         include: paths.appSrc,
         loader: 'babel',
-        
+        query: {
+          plugins: ['transform-async-to-generator', 'transform-decorators-legacy', ['fast-async', {
+            env: { dontMapStackTraces: true },
+          }],],
+        },
       },
       // The notation here is somewhat confusing.
       // "postcss" loader applies autoprefixer to our CSS.
