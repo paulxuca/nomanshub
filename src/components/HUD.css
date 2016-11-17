@@ -1,6 +1,5 @@
 .hudContainer {
   position: absolute;
-  width: 100%;
   color: white;
   margin-left: 20px;
   animation: fadeIn 0.3s ease-in;
@@ -31,5 +30,32 @@
 
 .repoDesc {
   font-size: 18px;
+  display: block;
   text-transform: lowercase;
+}
+
+.repoLink {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.5);
+  position: relative;
+  top: 20px;
+  height: 20px;
+  transition: all 0.3s ease-in;
+}
+
+.repoLink:hover {
+  color: rgba(255, 255, 255, 1);
+  transition: all 0.3s ease-in;
+}
+
+.arrowPointer {
+  width: 6px;
+  height: 6px;
+  transform: rotate(45deg);
+  display: inline-block;
+  border: 2px solid;
+  border-left: none;
+  position: relative;
+  bottom: 1px;
+  border-bottom: none;
 }

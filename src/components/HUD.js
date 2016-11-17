@@ -15,13 +15,13 @@ export default class HUD extends React.Component {
         baffle('.baffleRepoDesc')
         .start()
         .text(() => nextProps.repos[nextProps.index].description)
-        .reveal(1000);
+        .reveal(500);
       }
     }
   }
 
   render() {
-    const { user } = this.props;
+    const { user, repos, index } = this.props;
 
     return (
       <div className="hudContainer">
@@ -29,6 +29,14 @@ export default class HUD extends React.Component {
           <p>
             <span className="repoName baffleRepoName" />
             <span className="repoDesc baffleRepoDesc" />
+            {repos && repos[index] && <a
+              className="repoLink"
+              id="repoLink"
+              target="_blank"
+              href={repos[index].html_url}
+            >
+              View on Github <span className="arrowPointer" />
+            </a>}
           </p>
       </div>
     );

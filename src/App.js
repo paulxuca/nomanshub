@@ -19,6 +19,8 @@ let renderer;
 
 const planets = [];
 
+const getPlanetFromIndex = (index) => planets[index].planetObject.parent.position;
+
 function animate() {
   for (var i = 0; i < planets.length; i++) {
     planets[i].planetObject.rotation.y -= 0.001;
@@ -38,25 +40,21 @@ class App extends Component {
   }
 
   componentWillMount() {
+    this.handleFlag = 0;
+    this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.smoothLookAt = this.smoothLookAt.bind(this);
+
     const { getUser } = this.props.store.github;
     getUser('kshvmdn').then(() => {
       this.generatePlanet();      
       this.setState({ isLoaded: true });
     });
-    this.handleMouseUp = this.handleMouseUp.bind(this);
-    this.smoothLookAt = this.smoothLookAt.bind(this);
-    this.handleFlag = 0;
   }
 
   componentDidMount() {
-    window.addEventListener('mousemove', () => {
-      this.handleFlag = 1;
-    });
-    window.addEventListener('mousedown', () => {
-      this.handleFlag = 0;
-    });    
-    window.addEventListener('mouseup', this.handleMouseUp);
     window.addEventListener('resize', this.handleWindowResize);
+
 
     this.HEIGHT = window.innerHeight;
     this.WIDTH = window.innerWidth;
@@ -68,6 +66,10 @@ class App extends Component {
     document.getElementById('universe').appendChild(renderer.domElement);
     generateStars(scene, 300, this.WIDTH, this.HEIGHT);
   }
+
+  handlePrevRepo = () => this.props.store.github.prevRepo();
+  handleNextRepo = () => this.props.store.github.nextRepo();
+
 
   generatePlanet() {
     const { userRepos } = this.props.store.github;
@@ -81,6 +83,15 @@ class App extends Component {
         })
       );
     }
+    window.addEventListener('mousemove', () => {
+      this.handleFlag = 1;
+    });
+    window.addEventListener('mousedown', () => {
+      this.handleFlag = 0;
+    });
+
+    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('mouseup', this.handleMouseUp);
     animate();
   }
 
@@ -99,7 +110,7 @@ class App extends Component {
   }
 
   handleMouseUp(e) {
-    if (this.handleFlag === 0) {
+    if (planets && this.handleFlag === 0) {
       const mousePos = {
         x: e.clientX,
         y: e.clientY,
@@ -120,9 +131,18 @@ class App extends Component {
 
       if (minDistance < 200) {
         this.props.store.github.selectRepoIndex(minIndex);
-        this.smoothLookAt(planets[minIndex].planetObject.parent.position);
+        this.smoothLookAt(getPlanetFromIndex(minIndex));
       }     
     }
+  }
+
+  handleKeyDown(e) {
+    e.preventDefault();
+    if ([37, 39].indexOf(e.keyCode) !== -1) {
+      if (e.keyCode === 37) this.handlePrevRepo();
+      if (e.keyCode === 39) this.handleNextRepo();
+    }
+    this.smoothLookAt(getPlanetFromIndex(this.props.store.github.selectedRepoIndex));
   }
 
   render() {
