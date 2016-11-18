@@ -1,4 +1,12 @@
-import { randomColor, randomRange, getMaterial, shiftPosition, rule3, getWindow } from './space';
+import {
+  randomColor,
+  randomRange,
+  getRandomNumberBetweenTwoRanges,
+  getMaterial,
+  shiftPosition,
+  rule3,
+  getWindow,
+} from './space';
 
 const THREE = require('three');
 
@@ -29,6 +37,7 @@ class Planet {
   constructor({ scene, ageMultiplier, sizeMultiplier, stargazerMultiplier }) {
     const { HEIGHT, WIDTH } = getWindow();
     const planetRadius = randomRange(20, 80) * sizeMultiplier;   
+    this.type = "Planet";
     this.minRadius = randomRange(planetRadius + 10 , planetRadius + 20);
     this.maxRadius = planetRadius + randomRange(10, 40) * stargazerMultiplier / 10;
     this.minSpeed = randomRange(0,5)*0.1 + randomRange(0,9) * 0.01;
@@ -73,8 +82,8 @@ class Planet {
 
     posX = shiftPosition(posX, planetRadius);
     posY = shiftPosition(posY, planetRadius);
-    
-    orbitalMesh.position.set(posX, posY, randomRange(-100 * ageMultiplier, 100 * ageMultiplier) * ageMultiplier / 50);
+
+    orbitalMesh.position.set(posX, posY, getRandomNumberBetweenTwoRanges([-50 * ageMultiplier, -50 * (ageMultiplier - 1)], [50 * ageMultiplier, 50 * (ageMultiplier + 1)]));
     this.orbitalMesh = orbitalMesh;
     scene.add(orbitalMesh);
   }
@@ -102,7 +111,7 @@ class Planet {
       var posX = Math.cos(currentParticle.userData.angle)*currentParticle.userData.distance;
       var posZ = Math.sin(currentParticle.userData.angle)*currentParticle.userData.distance;
       currentParticle.position.x = posX;
-      currentParticle.position.z = posZ; 
+      currentParticle.position.z = posZ;
 
       currentParticle.rotation.x += Math.random() *.05;
       currentParticle.rotation.y += Math.random() *.05;
@@ -137,4 +146,4 @@ export const generatePlanets = (scene, userRepos) => {
   return planets;
 }
 
-export const getPlanetFromIndex = (planets, index) => planets[index].planetObject.parent.position;
+export const getPlanetFromIndex = (planets, index) => planets[index].orbitalMesh;

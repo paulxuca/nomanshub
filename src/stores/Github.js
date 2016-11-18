@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { observable, transaction } from 'mobx';
 import 'whatwg-fetch';
 
 const toJSON = (s) => s.json();
@@ -10,9 +10,11 @@ export default class GithubStore {
   @observable userRepos;
   @observable fetchErrors;
   @observable selectedRepoIndex;
+  @observable selectedStarIndex;
+  @observable isRepoSelected = true;
 
   constructor() {
-    this.githubUsername = 'kshvmdn';
+    this.githubUsername = 'paulxuca';
     this.getUser = this.getUser.bind(this);
     this.nextRepo = this.nextRepo.bind(this);
     this.prevRepo = this.prevRepo.bind(this);
@@ -20,21 +22,34 @@ export default class GithubStore {
 
   nextRepo() {
     if (this.selectedRepoIndex + 1 < this.userRepos.length) {
-      this.selectedRepoIndex++;
+      this.selectRepoIndex(this.selectedRepoIndex++);
     } else {
-      this.selectedRepoIndex = 0;
+      this.selectRepoIndex(0);
     }
+    return this.selectedRepoIndex;
   }
 
   prevRepo(){
     if (this.selectedRepoIndex - 1 >= 0) {
+      this.selectRepoIndex(this.selectedRepoIndex--);
       this.selectedRepoIndex--;
     } else {
-      this.selectedRepoIndex = this.userRepos.length - 1;
+      this.selectRepoIndex(this.userRepos.length - 1);
     }
+    return this.selectedRepoIndex;
   }
 
-  selectRepoIndex = (i) => this.selectedRepoIndex = i;
+  selectRepoIndex = (i) => {
+    this.isRepoSelected = true;    
+    this.selectedRepoIndex = i;
+  }
+
+  selectStarIndex = (i) => {
+    transaction(() => {
+      this.isRepoSelected = false;    
+      this.selectedStarIndex = i;
+    });
+  }
 
   async getUser() {
     const username = this.githubUsername;

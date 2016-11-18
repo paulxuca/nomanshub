@@ -12,6 +12,14 @@ export const getRaycaster = () => new THREE.Raycaster();
 export const getMouse = () => new THREE.Vector2();
 
 export const randomRange = (min, max) => Math.floor(Math.random()*(max-min+1)+min);
+
+export const getRandomNumberBetweenTwoRanges = ([rl1, rh1], [rl2, rh2]) => {
+  const random = Math.random();
+  if (random < 0.5) {
+    return randomRange(rl1, rh1);
+  }
+  return randomRange(rl2, rh2);
+}
 export const randomColor = () => Please.make_color()[0];
 export const getMaterial = (color) => {
   return new THREE.MeshStandardMaterial({
@@ -68,7 +76,7 @@ export const initApp = (height, width) => {
   const ambientLight = new THREE.AmbientLight(0x663344,2);
   scene.add(ambientLight);
   const light = new THREE.DirectionalLight(0xffffff, 1.5);
-  light.position.set(200,100,200);
+  light.position.set(0,0,200);
   light.castShadow = true;
 
   light.shadow.camera.near = 1;

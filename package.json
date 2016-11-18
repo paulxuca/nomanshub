@@ -59,7 +59,7 @@
     "react-dom": "^15.3.2",
     "styled-components": "^1.0.11",
     "three": "^0.82.1",
-    "three-orbitcontrols": "https://github.com/paulxuca/three-orbitcontrols.git",
+    "three-orbitcontrols": "git+https://github.com/paulxuca/three-orbitcontrols.git",
     "tween.js": "^16.3.5",
     "whatwg-fetch": "^2.0.1"
   },

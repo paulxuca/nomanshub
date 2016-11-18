@@ -1,39 +1,53 @@
 import React from 'react';
 import baffle from 'baffle';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import './HUD.css';
 
-@inject('store') @observer
+@observer
 export default class HUD extends React.Component {
+  componentDidMount() {
+    this.baffleRepoName = baffle('.baffleRepoName');
+    this.baffleRepoDesc = baffle('.baffleRepoDesc');
+  }
+
   componentWillUpdate(nextProps) {
-    if (!!(nextProps.index + 1)) {
-      baffle('.baffleRepoName')
+    if (nextProps.isRepo && nextProps.selectedRepo) {
+     this.baffleRepoName
         .start()
-        .text(() => nextProps.repos[nextProps.index].name)
+        .text(() => nextProps.selectedRepo.name)
         .reveal(500);
-      if (nextProps.repos[nextProps.index].description) {
-        baffle('.baffleRepoDesc')
+      if (nextProps.selectedRepo.description) {
+        this.baffleRepoDesc
         .start()
-        .text(() => nextProps.repos[nextProps.index].description)
+        .text(() => nextProps.selectedRepo.description)
         .reveal(500);
       }
+    } else {
+      this.baffleRepoName.text(() => '');
+      this.baffleRepoDesc.text(() => '');
     }
   }
 
   render() {
-    const { user, repos, index } = this.props;
+    const { user, selectedRepo, isRepo, selectedFollower } = this.props;
 
     return (
       <div className="hudContainer">
-        <h2 className="githubUsername">{user.login}<span className="companyName">{user.company}</span></h2>
+        <h2 className={`githubUsername ${!isRepo && 'githubFollower'}`}>
+          {isRepo ?
+            <span>{user.login}</span> :
+            <span>{selectedFollower.login}</span>
+          }
+          <span className="companyName">{user.company}</span>
+        </h2>
           <p>
             <span className="repoName baffleRepoName" />
             <span className="repoDesc baffleRepoDesc" />
-            {repos && repos[index] && <a
+            {isRepo && selectedRepo && <a
               className="repoLink"
               id="repoLink"
               target="_blank"
-              href={repos[index].html_url}
+              href={selectedRepo.html_url}
             >
               View on Github <span className="arrowPointer" />
             </a>}

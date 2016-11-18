@@ -3,7 +3,10 @@ import { observer, inject } from 'mobx-react';
 
 import HUD from './components/HUD';
 
-import { generatePlanets, getPlanetFromIndex } from './utils/Planet';
+import {
+  generatePlanets,
+  getPlanetFromIndex,
+} from './utils/Planet';
 import {
   initApp,
   point2Distance,
@@ -11,7 +14,10 @@ import {
   screenXY,
   updateTween,
 } from './utils/space';
-import { generateStars } from './utils/stars';
+import {
+  generateStars,
+  generateFollowerStars,
+} from './utils/stars';
 import './App.css';
 
 let scene;
@@ -19,6 +25,7 @@ let camera;
 let renderer;
 let controls;
 let planets;
+let followerStars;
 
 function animate() {
   for (var i = 0; i < planets.length; i++) {
@@ -47,7 +54,8 @@ class App extends Component {
 
     const { getUser } = this.props.store.github;
     getUser().then(() => {
-      this.generatePlanet();      
+      this.generatePlanet();
+      followerStars = generateFollowerStars(scene, this.props.store.github.userFollowers, this.WIDTH, this.HEIGHT);
       this.setState({ isLoaded: true });
     });
   }
@@ -109,44 +117,72 @@ class App extends Component {
         y: e.clientY,
       };
 
-      const firstPlanetPos = screenXY(planets[0].planetObject.parent, camera, renderer);
-      let minDistance = point2Distance(mousePos, firstPlanetPos);
+      const starsAndPlanets = planets.concat(followerStars);
+      const firstEntityPos = screenXY(starsAndPlanets[0].planetObject.parent, camera, renderer);
+      let minDistance = point2Distance(mousePos, firstEntityPos);
       let minIndex = 0;
 
-      for (var i = 1; i < planets.length; i++) {
-        const planetPos = screenXY(planets[i].planetObject.parent, camera, renderer);
-        const mouseDistance = point2Distance(mousePos, planetPos);
-        if (mouseDistance < minDistance) {
+      for (let i = 0; i < starsAndPlanets.length; i++) {
+        let entity;
+        if (starsAndPlanets[i].type === 'Planet') {
+          entity = starsAndPlanets[i].planetObject.parent;
+        } else {
+          entity = starsAndPlanets[i];
+        }
+
+        const pos = screenXY(entity, camera, renderer);
+        const mDistance = point2Distance(mousePos, pos);
+        if (mDistance < minDistance) {
           minIndex = i;
-          minDistance = mouseDistance;
+          minDistance = mDistance;
         }
       }
+      
+      if (minDistance < 50
+        || (starsAndPlanets[minIndex].type !== 'Planet' && minDistance < 250)) {
+        let entity;
+        if (starsAndPlanets[minIndex].type === 'Planet') {
+          entity = getPlanetFromIndex(planets, minIndex);
+          this.props.store.github.selectRepoIndex(minIndex);
+        } else {
+          this.props.store.github.selectStarIndex(minIndex - planets.length - 1);
+          entity = starsAndPlanets[minIndex];
+        }
 
-      if (minDistance < 200) {
-        this.props.store.github.selectRepoIndex(minIndex);
-        this.smoothLookAt(getPlanetFromIndex(planets, minIndex));
-      }     
+        this.smoothLookAt(entity.position);
+      }
     }
   }
 
   handleKeyDown(e) {
-    e.preventDefault();
     if ([37, 39].indexOf(e.keyCode) !== -1) {
-      if (e.keyCode === 37) this.handlePrevRepo();
-      if (e.keyCode === 39) this.handleNextRepo();
+      let newIndex;
+      if (e.keyCode === 37) newIndex = this.handlePrevRepo();
+      if (e.keyCode === 39) newIndex = this.handleNextRepo();
+      const nextRepoLookAt = getPlanetFromIndex(planets, newIndex);
+      this.smoothLookAt(nextRepoLookAt.position); 
     }
-    this.smoothLookAt(getPlanetFromIndex(planets, this.props.store.github.selectedRepoIndex));
   }
 
   render() {
-    const { userData, userRepos, selectedRepoIndex } = this.props.store.github;
+    const {
+      userData,
+      userRepos,
+      selectedRepoIndex,
+      selectedStarIndex,
+      isRepoSelected,
+      userFollowers,
+  } = this.props.store.github;
+
+    console.log(userFollowers, selectedStarIndex);
 
     return (
       <div className="App">
         {this.state.isLoaded ? <HUD
-          repos={userRepos}
+          selectedRepo={userRepos[selectedRepoIndex]}
+          selectedFollower={userFollowers[selectedStarIndex]}
           user={userData}
-          index={selectedRepoIndex}
+          isRepo={isRepoSelected}
           /> : null}
         <div id="universe" />
       </div>
