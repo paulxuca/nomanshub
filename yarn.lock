@@ -2568,11 +2568,6 @@ https-browserify@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-0.0.0.tgz#b3ffdfe734b2a3d4a9efd58e8654c91fce86eafd"
 
-"https://github.com/paulxuca/three-orbitcontrols.git":
-  name three-orbitcontrols
-  version "1.1.2"
-  resolved "https://github.com/paulxuca/three-orbitcontrols.git#4db78ec295a4b32472594bde439ff0cc850e9942"
-
 iconv-lite@^0.4.13, iconv-lite@~0.4.13, iconv-lite@0.4.13:
   version "0.4.13"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.13.tgz#1f88aba4ab0b1508e8312acc39345f36e992e2f2"
@@ -3976,6 +3971,10 @@ pkg-up@^1.0.0:
   dependencies:
     find-up "^1.0.0"
 
+pleasejs:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/pleasejs/-/pleasejs-0.4.2.tgz#aaaa1a5fa6902518de7e51e3c63b5f537f823164"
+
 pluralize@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-1.2.1.tgz#d1a21483fd22bb41e58a12fa3421823140897c45"
@@ -5041,6 +5040,10 @@ text-table@~0.2.0:
 three:
   version "0.82.1"
   resolved "https://registry.yarnpkg.com/three/-/three-0.82.1.tgz#f63c3730971520c54479e3627d370d764a4a8383"
+
+"three-orbitcontrols@https://github.com/paulxuca/three-orbitcontrols.git":
+  version "1.1.2"
+  resolved "https://github.com/paulxuca/three-orbitcontrols.git#4db78ec295a4b32472594bde439ff0cc850e9942"
 
 throat@^3.0.0:
   version "3.0.0"

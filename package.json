@@ -55,6 +55,7 @@
     "fast-async": "^6.1.2",
     "mobx": "^2.6.2",
     "mobx-react": "^3.5.9",
+    "pleasejs": "^0.4.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "styled-components": "^1.0.11",

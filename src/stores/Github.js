@@ -12,6 +12,7 @@ export default class GithubStore {
   @observable selectedRepoIndex;
 
   constructor() {
+    this.githubUsername = 'kshvmdn';
     this.getUser = this.getUser.bind(this);
     this.nextRepo = this.nextRepo.bind(this);
     this.prevRepo = this.prevRepo.bind(this);
@@ -35,7 +36,9 @@ export default class GithubStore {
 
   selectRepoIndex = (i) => this.selectedRepoIndex = i;
 
-  async getUser(username) {
+  async getUser() {
+    const username = this.githubUsername;
+
     try {
       const [repoData, userData, userFollowers] = await Promise.all([
         fetch(`https://api.github.com/users/${username}/repos?sort=pushed`).then(toJSON),

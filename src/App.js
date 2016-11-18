@@ -3,12 +3,13 @@ import { observer, inject } from 'mobx-react';
 
 import HUD from './components/HUD';
 
-import { generatePlanets, getPlanetFromIndex } from './utils/planet';
+import { generatePlanets, getPlanetFromIndex } from './utils/Planet';
 import {
   initApp,
   point2Distance,
   buildSmoothCamera,
   screenXY,
+  updateTween,
 } from './utils/space';
 import { generateStars } from './utils/stars';
 import './App.css';
@@ -16,6 +17,7 @@ import './App.css';
 let scene;
 let camera;
 let renderer;
+let controls;
 let planets;
 
 function animate() {
@@ -24,6 +26,7 @@ function animate() {
     planets[i].updateParticlesRotation();
   }
   renderer.render(scene, camera);
+  updateTween();
   requestAnimationFrame(animate);
 }
 
@@ -43,7 +46,7 @@ class App extends Component {
     this.smoothLookAt = this.smoothLookAt.bind(this);
 
     const { getUser } = this.props.store.github;
-    getUser('kshvmdn').then(() => {
+    getUser().then(() => {
       this.generatePlanet();      
       this.setState({ isLoaded: true });
     });
@@ -59,6 +62,7 @@ class App extends Component {
     scene = settings.scene;
     renderer = settings.renderer;
     camera = settings.camera;
+    controls = settings.controls;
 
     document.getElementById('universe').appendChild(renderer.domElement);
     generateStars(scene, 300, this.WIDTH, this.HEIGHT);

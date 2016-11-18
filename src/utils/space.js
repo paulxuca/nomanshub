@@ -1,21 +1,7 @@
 const THREE = require('three');
-// const TWEEN = require('tween.js');
-const OrbitControls = require('three-orbitcontrols')
-
-let controls;
-
-const Colors = {
-  red : 0xf85051,
-  orange: 0xea8962,
-  yellow: 0xdacf75,
-  beige: 0xccc58f,
-  grey: 0xbab7a1,
-  blue: 0x4379a8,
-  ocean: 0x4993a8,
-  green: 0x24a99b
-};
-
-const colorsLength = Object.keys(Colors).length;
+const TWEEN = require('tween.js');
+const Please = require('pleasejs');
+const OrbitControls = require('three-orbitcontrols');
 
 export const getWindow = () => ({
   HEIGHT: window.innerHeight,
@@ -26,19 +12,15 @@ export const getRaycaster = () => new THREE.Raycaster();
 export const getMouse = () => new THREE.Vector2();
 
 export const randomRange = (min, max) => Math.floor(Math.random()*(max-min+1)+min);
-export const randomColor = () => {
-  var colIndx = Math.floor(Math.random()*colorsLength);
-  var colorStr = Object.keys(Colors)[colIndx];
-  return Colors[colorStr];
-}
+export const randomColor = () => Please.make_color()[0];
 export const getMaterial = (color) => {
   return new THREE.MeshStandardMaterial({
-    color:color,
-    roughness:.9,
+    color,
+    roughness: .9,
     transparent: true,
     opacity: 1,
-    emissive:0x270000,
-    shading:THREE.FlatShading
+    emissive: 0x270000,
+    shading: THREE.FlatShading
   });
 }
 
@@ -66,7 +48,7 @@ export const rule3 = (v,vmin,vmax,tmin, tmax) => {
 export const initApp = (height, width) => {
   const scene = new THREE.Scene();
   
-  const camera = new THREE.PerspectiveCamera(75, width / height, .1, 3000);
+  const camera = new THREE.PerspectiveCamera(75, width / height, .1, 4000);
   camera.position.z = 1;
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
@@ -78,7 +60,7 @@ export const initApp = (height, width) => {
   renderer.setSize(width, height);
   renderer.shadowMap.enabled = true;
   
-  controls = new OrbitControls(camera, renderer.domElement);
+  const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.25;
   controls.enableZoom = false;
@@ -100,6 +82,7 @@ export const initApp = (height, width) => {
     scene,
     renderer,
     camera,
+    controls,
   };
 }
 
@@ -122,8 +105,31 @@ export const screenXY = (obj, camera, renderer) => {
   };
 };
 
-export const buildSmoothCamera = (camera, position) => {
-  camera.lookAt(position);
+export const point2Distance = (a, b) => Math.sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
+
+export const buildSmoothCamera = (camera, target, duration = 1000) => {
+  
+  const cameraClone = camera.clone();
+  const startRotation = new THREE.Euler().copy(cameraClone.rotation);
+
+  // final rotation (with lookAt)
+  cameraClone.lookAt(target);
+  var endRotation = new THREE.Euler().copy(cameraClone.rotation);
+  cameraClone.rotation.copy(startRotation);
+
+  // Tween
+  TWEEN.removeAll();
+  new TWEEN.Tween(startRotation)
+    .to(endRotation, duration)
+    .onUpdate(() => {
+      camera.rotation.x = startRotation._x;
+      camera.rotation.y = startRotation._y;
+      camera.rotation.z = startRotation._z;
+    })
+    .easing(TWEEN.Easing.Sinusoidal.InOut)
+    .start();
+  
+
 }
 
-export const point2Distance = (a, b) => Math.sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
+export const updateTween = () => TWEEN.update();
