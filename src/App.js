@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 
 import HUD from './components/HUD';
 
-import Planet from './utils/planet';
+import { generatePlanets, getPlanetFromIndex } from './utils/planet';
 import {
   initApp,
   point2Distance,
@@ -16,10 +16,7 @@ import './App.css';
 let scene;
 let camera;
 let renderer;
-
-const planets = [];
-
-const getPlanetFromIndex = (index) => planets[index].planetObject.parent.position;
+let planets;
 
 function animate() {
   for (var i = 0; i < planets.length; i++) {
@@ -73,16 +70,8 @@ class App extends Component {
 
   generatePlanet() {
     const { userRepos } = this.props.store.github;
-    for (var i = 0; i < userRepos.length; i ++) {
-      planets.push(
-        new Planet({
-          scene,
-          ageMultiplier: i,
-          sizeMultiplier: userRepos[i].size / 40000 + 1,
-          stargazerMultiplier: userRepos[i].stargazers_count,
-        })
-      );
-    }
+    planets = generatePlanets(scene, userRepos);
+
     window.addEventListener('mousemove', () => {
       this.handleFlag = 1;
     });
@@ -131,7 +120,7 @@ class App extends Component {
 
       if (minDistance < 200) {
         this.props.store.github.selectRepoIndex(minIndex);
-        this.smoothLookAt(getPlanetFromIndex(minIndex));
+        this.smoothLookAt(getPlanetFromIndex(planets, minIndex));
       }     
     }
   }
@@ -142,7 +131,7 @@ class App extends Component {
       if (e.keyCode === 37) this.handlePrevRepo();
       if (e.keyCode === 39) this.handleNextRepo();
     }
-    this.smoothLookAt(getPlanetFromIndex(this.props.store.github.selectedRepoIndex));
+    this.smoothLookAt(getPlanetFromIndex(planets, this.props.store.github.selectedRepoIndex));
   }
 
   render() {

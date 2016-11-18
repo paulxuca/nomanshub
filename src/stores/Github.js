@@ -4,6 +4,8 @@ import 'whatwg-fetch';
 const toJSON = (s) => s.json();
 
 export default class GithubStore {
+  @observable githubUsername;
+  @observable userFollowers;
   @observable userData;
   @observable userRepos;
   @observable fetchErrors;
@@ -35,11 +37,16 @@ export default class GithubStore {
 
   async getUser(username) {
     try {
-      const fetchData = await fetch(`https://api.github.com/users/${username}/repos?sort=pushed`).then(toJSON);
-      this.userRepos = fetchData;
-      const userData = await fetch(`https://api.github.com/users/${username}`).then(toJSON);
+      const [repoData, userData, userFollowers] = await Promise.all([
+        fetch(`https://api.github.com/users/${username}/repos?sort=pushed`).then(toJSON),
+        fetch(`https://api.github.com/users/${username}`).then(toJSON),
+        fetch(`https://api.github.com/users/${username}/following`).then(toJSON),
+      ]);
+
+      this.userRepos = repoData;
       this.userData = userData;
-      return this.userData;
+      this.userFollowers = userFollowers;
+      return this.userRepos;
     } catch (error) {
       console.error(error);
       this.fetchErrors = error;

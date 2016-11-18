@@ -25,7 +25,7 @@ class Particle {
   }
 }
 
-export default class Planet {
+class Planet {
   constructor({ scene, ageMultiplier, sizeMultiplier, stargazerMultiplier }) {
     const { HEIGHT, WIDTH } = getWindow();
     const planetRadius = randomRange(20, 80) * sizeMultiplier;   
@@ -117,3 +117,19 @@ export default class Planet {
   }
 }
 
+export const generatePlanets = (scene, userRepos) => {
+  const planets = [];
+  for (let i = 0; i < userRepos.length; i++) {
+    planets.push(
+      new Planet({
+        scene,
+        ageMultiplier: i,
+        sizeMultiplier: userRepos[i].size / 40000 + 1,
+        stargazerMultiplier: userRepos[i].stargazers_count,
+      })
+    );
+  }
+  return planets;
+}
+
+export const getPlanetFromIndex = (planets, index) => planets[index].planetObject.parent.position;
