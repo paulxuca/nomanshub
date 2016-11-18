@@ -73,9 +73,14 @@ class Planet {
 
     posX = shiftPosition(posX, planetRadius);
     posY = shiftPosition(posY, planetRadius);
-
+    
     orbitalMesh.position.set(posX, posY, randomRange(-100 * ageMultiplier, 100 * ageMultiplier) * ageMultiplier / 5);
+    this.orbitalMesh = orbitalMesh;
     scene.add(orbitalMesh);
+  }
+
+  remove(scene) {
+    scene.remove(this.orbitalMesh);
   }
 
   constructRing() {
